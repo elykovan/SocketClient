@@ -4,9 +4,22 @@ import java.util.Scanner;
 import java.net.*;
 import java.io.*;
 
+
 public class MySocketClient {
 
     public static void main(String[] args) throws Exception {
+        /*
+        Socket socket = new Socket("cdn.wennermedia.net", 80);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        //Send request
+        out.println("GET /jquery/latest/jquery.min.js HTTP/1.0\r\n\r\n");
+        out.flush();
+
+        //Read one line of input
+        System.out.println("Response " + in.readLine());        
+        */
         String input;
         //Scanner scan = new Scanner(System.in);
         //System.out.println("Enter the URL: " );
@@ -14,18 +27,26 @@ public class MySocketClient {
         //System.out.println("You entered: " + input);
 
        
-        Socket sock;
-        PrintWriter out = null;
+        Socket sock = null;
+        PrintStream out = null;
         BufferedReader buffReader = null;
+        DataOutputStream outStream = null;
+                       
         
         try {
-            sock = new Socket("localhost", 80);
+            sock = new Socket("google.com", 80);
             
-            out = new PrintWriter(sock.getOutputStream(), true);     
-            out.print("GET /Website1/default.aspx HTTP/1.1\n");
+            //out = new PrintStream(sock.getOutputStream(), true);     
+            outStream = new DataOutputStream(sock.getOutputStream());
+            outStream.writeBytes("GET /index.html HTTP/1.0\r\n\r\n");
+            outStream.flush();
             buffReader = new BufferedReader(new InputStreamReader(sock.getInputStream())); 
-            System.out.println(buffReader.read());
             
+            String result = null;
+            
+            while((result = buffReader.readLine()) != null) {
+                System.out.println(result);
+            }
         }
         catch (UnknownHostException ex) {  
             System.out.println(ex.getMessage());
@@ -34,8 +55,10 @@ public class MySocketClient {
             System.out.println(io.getMessage());
         }
         finally {
-            out.close();
+            //out.close();
+            if (outStream != null) outStream.close();
             if (buffReader != null) buffReader.close();
+            if (sock != null) sock.close();
         }
         
     }
