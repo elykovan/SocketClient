@@ -8,56 +8,39 @@ import java.io.*;
 public class MySocketClient {
 
     public static void main(String[] args) throws Exception {
-        /*
-        Socket socket = new Socket("cdn.wennermedia.net", 80);
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-        //Send request
-        out.println("GET /jquery/latest/jquery.min.js HTTP/1.0\r\n\r\n");
-        out.flush();
-
-        //Read one line of input
-        System.out.println("Response " + in.readLine());        
-        */
-        String input;
+        //String input;
         //Scanner scan = new Scanner(System.in);
         //System.out.println("Enter the URL: " );
         //input = scan.next();
         //System.out.println("You entered: " + input);
-
        
         Socket sock = null;
         PrintStream out = null;
-        BufferedReader buffReader = null;
-        DataOutputStream outStream = null;
+        BufferedReader in = null;
                        
         
         try {
-            sock = new Socket("google.com", 80);
+            sock = new Socket("localhost", 80);
+            out = new PrintStream(sock.getOutputStream(), true);     
+            in = new BufferedReader(new InputStreamReader(sock.getInputStream())); 
+
+            out.print("GET /Website1/ HTTP/1.1\n");
+            out.print("Host: localhost\n\n");
+            out.flush();
             
-            //out = new PrintStream(sock.getOutputStream(), true);     
-            outStream = new DataOutputStream(sock.getOutputStream());
-            outStream.writeBytes("GET /index.html HTTP/1.0\r\n\r\n");
-            outStream.flush();
-            buffReader = new BufferedReader(new InputStreamReader(sock.getInputStream())); 
-            
-            String result = null;
-            
-            while((result = buffReader.readLine()) != null) {
-                System.out.println(result);
+            // In the real client, I would have to use the Content-Length header to know the end of HTTP response stream is reached
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                System.out.println(inputLine);
             }
+            System.exit(0); // this line is never reached 
         }
-        catch (UnknownHostException ex) {  
+        catch(Exception ex) {
             System.out.println(ex.getMessage());
         }
-        catch (IOException io) {
-            System.out.println(io.getMessage());
-        }
         finally {
-            //out.close();
-            if (outStream != null) outStream.close();
-            if (buffReader != null) buffReader.close();
+            if (out != null) out.close();
+            if (in != null) in.close();
             if (sock != null) sock.close();
         }
         
